@@ -1,5 +1,6 @@
 const mysql = require("mysql");
 const inquirer = require("inquirer");
+var productStock = 0;
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -39,29 +40,22 @@ function runApp(){
               runApp();
             }
             else{
+              productStock = res2[0].stock_quantity;
               inquirer.prompt([
                 {
                   type: "input",
-                  message: `How many ${res2.product_name} do you want to purchase for $${res2.price}`,
+                  message: `How many do you want to purchase?`,
                   name: "quant"
                 }
               ]).then(function(response2){
-                if(res2.stock_quantity > parseInt(response2.quant)){
-                  console.log("Thank you! Your total is $" + response2.quant * res2.price)
-                  var newQuant = res2.stock_quantity - response2.quant;
-                  connection.query(
-                    "UPDATE songs SET ? WHERE ?",[
-                      {
-                        productID : response.productID
-                      },
-                      {
-                        stock_quantity : newQuant
-                      }
-                    ])
-                  console.log("stock updated")
-                  runApp();
+                
+                if(productStock > parseInt(response2.quant)){
+                  console.log("Thank you for your purchase!")
+                  var newQuant = productStock - response2.quant;
+                  console.log(newQuant)
                 }
                 else{
+                  console.log(productStock)
                   console.log("Sorry. Insuficient stock.")
                   runApp();
                 }
