@@ -11,17 +11,20 @@ const connection = mysql.createConnection({
   database: "bamazon_db"
 });
 
-function runApp(){
-  connection.connect(function(err) {
-    if (err) throw err;
+
+connection.connect(function(err) {
+  if (err) throw err;
+  runApp();
+});
   
-    connection.query("SELECT * FROM products", function(err, res) {
-      if (err) throw err;
-      console.log("Available Products:")
-      for(i=0; i < res.length; i++){
-        productInfo = res[i].item_id + " " + res[i].product_name + " $" + res[i].price; 
-        console.log(productInfo);
-      }
+function runApp(){
+  connection.query("SELECT * FROM products", function(err, res) {
+    if (err) throw err;
+    console.log("Available Products:")
+    for(i=0; i < res.length; i++){
+      productInfo = res[i].item_id + " " + res[i].product_name + " $" + res[i].price; 
+      console.log(productInfo);
+    }
       inquirer.prompt([
         {
           type: "input",
@@ -38,7 +41,7 @@ function runApp(){
             if(err) throw err;
             if(res2.length === 0){
               console.log("Invalid Selection")
-              connection.end();
+              runApp();
               
             }
             else{
@@ -47,7 +50,7 @@ function runApp(){
               inquirer.prompt([
                 {
                   type: "input",
-                  message: `How many do you want to purchase?`,
+                  message: "How many do you want to purchase?",
                   name: "quant"
                 }
               ]).then(function(response2){
@@ -68,8 +71,7 @@ function runApp(){
                     ],
                     function(err, res) {
                       console.log(res.affectedRows + " product stock updated!");
-                      console.log(itemID)
-                      connection.end();
+                      runApp();
                       
                       
                     }
@@ -77,9 +79,9 @@ function runApp(){
 
                 }
                 else{
-                  console.log(productStock)
+                  console.log(productStock + " currently in stock")
                   console.log("Sorry. Insuficient stock.")
-                  connection.end();
+                  runApp();
                   
                 }
               })
@@ -93,6 +95,5 @@ function runApp(){
       })
 
     });
-  });
 }
-runApp();
+  
